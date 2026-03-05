@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome back!</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f0eeeb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      width: 900px;
+      height: 560px;
+      background: #fff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .left-panel {
+      flex: 1;
+      background: #e8e4de;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #characters-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .right-panel {
+      width: 340px;
+      padding: 44px 40px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #fff;
+    }
+
+    .logo { font-size: 26px; margin-bottom: 20px; display: block; }
+
+    .right-panel h1 {
+      font-size: 26px; font-weight: 700; color: #111; margin-bottom: 4px;
+    }
+    .right-panel .subtitle {
+      font-size: 13px; color: #888; margin-bottom: 28px;
+    }
+
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block; font-size: 13px; font-weight: 500; color: #333; margin-bottom: 6px;
+    }
+    .field .input-wrap { position: relative; }
+    .field input {
+      width: 100%; border: none; border-bottom: 1.5px solid #ddd;
+      padding: 8px 36px 8px 0; font-size: 14px; color: #111;
+      background: transparent; outline: none; transition: border-color 0.2s;
+    }
+    .field input:focus { border-bottom-color: #111; }
+
+    .eye-btn {
+      position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: #aaa;
+      padding: 2px; display: flex; align-items: center;
+    }
+    .eye-btn:hover { color: #555; }
+
+    .options-row {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px;
+    }
+    .remember-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: #666; cursor: pointer; user-select: none;
+    }
+    .remember-label input[type="checkbox"] { accent-color: #111; width: 13px; height: 13px; }
+    .forgot-link { font-size: 12px; color: #555; text-decoration: none; }
+    .forgot-link:hover { text-decoration: underline; }
+
+    .btn-login {
+      width: 100%; padding: 13px; background: #111; color: #fff;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background 0.2s; margin-bottom: 12px;
+    }
+    .btn-login:hover { background: #333; }
+
+    .btn-google {
+      width: 100%; padding: 12px; background: #fff; color: #333;
+      border: 1.5px solid #ddd; border-radius: 8px; font-size: 13px;
+      font-weight: 500; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+      transition: background 0.2s, border-color 0.2s; margin-bottom: 20px;
+    }
+    .btn-google:hover { background: #f7f7f7; border-color: #bbb; }
+    .btn-google svg { width: 17px; height: 17px; }
+
+    .signup-row { text-align: center; font-size: 12.5px; color: #888; }
+    .signup-row a { color: #111; font-weight: 600; text-decoration: none; }
+    .signup-row a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="left-panel">
+    <!--
+      SVG viewBox: 420 x 560
+      Floor at y=440
+      Characters tightly grouped, left-center of panel
+
+      Positions (紧凑排列):
+        Orange semicircle: cx=105, floor=440, r=125 (background)
+        Purple tall rect:  cx=178, bottom=440, top=175, w=100 (瘦一些)
+        Black rect:        cx=258, bottom=440, top=272, w=68
+        Yellow capsule:    cx=328, bottom=440, top=316, w=52
+    -->
+    <svg id="characters-svg" viewBox="0 0 420 560" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Background wall -->
+      <rect x="0" y="0" width="420" height="560" fill="#e8e4de"/>
+      <!-- Floor -->
+      <rect x="0" y="440" width="420" height="120" fill="#d4cfc8"/>
+      <!-- Floor edge shadow -->
+      <rect x="0" y="440" width="420" height="4" fill="rgba(0,0,0,0.06)"/>
+
+      <!-- ClipPath for orange: cx=135 -->
+      <defs>
+        <clipPath id="orange-clip">
+          <path d="M135,440 m-125,0 a125,125 0 1,1 250,0 Z"/>
+        </clipPath>
+      </defs>
+
+      <!-- ============================================================
+           绘制顺序（后绘制的在上层，优先级：黄>橙>黑>紫）
+           1. 紫色 (最底层)
+           2. 黑色
+           3. 橙色
+           4. 黄色 (最顶层)
+      ============================================================ -->
+
+      <!-- 1. PURPLE — bottom layer -->
+      <g id="purple-char" style="transform-origin: 178px 440px">
+        <ellipse cx="178" cy="444" rx="46" ry="6" fill="rgba(0,0,0,0.1)"/>
+        <g id="purple-body-group">
+          <rect id="purple-neck" x="160" y="230" width="36" height="0" fill="#6B4FE0" rx="0"/>
+          <rect id="purple-body-rect" x="128" y="175" width="100" height="265" fill="#6B4FE0" rx="18"/>
+          <rect x="135" y="184" width="36" height="80" rx="10" fill="rgba(255,255,255,0.07)"/>
+        </g>
+        <g id="purple-face" style="transform-origin: 178px 260px">
+          <circle id="purple-eye-l-bg" cx="158" cy="258" r="12" fill="#fff"/>
+          <circle id="purple-pupil-l" cx="158" cy="258" r="6.5" fill="#1a1a1a"/>
+          <circle cx="154" cy="254" r="2.2" fill="rgba(255,255,255,0.7)"/>
+          <rect id="purple-lid-top-l" x="146" y="233" width="24" height="25" fill="#6B4FE0"/>
+          <rect id="purple-lid-bot-l" x="146" y="258" width="24" height="25" fill="#6B4FE0"/>
+          <circle id="purple-eye-r-bg" cx="198" cy="258" r="12" fill="#fff"/>
+          <circle id="purple-pupil-r" cx="198" cy="258" r="6.5" fill="#1a1a1a"/>
+          <circle cx="194" cy="254" r="2.2" fill="rgba(255,255,255,0.7)"/>
+          <rect id="purple-lid-top-r" x="186" y="233" width="24" height="25" fill="#6B4FE0"/>
+          <rect id="purple-lid-bot-r" x="186" y="258" width="24" height="25" fill="#6B4FE0"/>
+          <path id="purple-mouth" d="M163,288 Q178,298 193,288"
+                stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </g>
+        <g id="purple-arm-l" style="transform-origin: 128px 340px">
+          <rect x="92" y="332" width="38" height="14" rx="7" fill="#5540c8"/>
+          <circle cx="92" cy="339" r="12" fill="#5540c8"/>
+          <circle cx="84" cy="334" r="3.5" fill="#4432a8"/>
+          <circle cx="84" cy="344" r="3.5" fill="#4432a8"/>
+        </g>
+        <g id="purple-arm-r" style="transform-origin: 228px 340px">
+          <rect x="228" y="332" width="38" height="14" rx="7" fill="#5540c8"/>
+          <circle cx="266" cy="339" r="12" fill="#5540c8"/>
+          <circle cx="274" cy="334" r="3.5" fill="#4432a8"/>
+          <circle cx="274" cy="344" r="3.5" fill="#4432a8"/>
+        </g>
+      </g>
+
+      <!-- 2. BLACK -->
+      <g id="black-char" style="transform-origin: 262px 440px">
+        <ellipse cx="262" cy="444" rx="32" ry="5" fill="rgba(0,0,0,0.12)"/>
+        <rect x="228" y="272" width="68" height="168" fill="#222" rx="11"/>
+        <rect x="234" y="280" width="18" height="46" rx="5" fill="rgba(255,255,255,0.07)"/>
+        <g id="black-face" style="transform-origin: 262px 315px">
+          <circle cx="248" cy="308" r="9.5" fill="#fff"/>
+          <circle id="black-pupil-l" cx="248" cy="309" r="5" fill="#111"/>
+          <circle cx="245" cy="305" r="1.8" fill="rgba(255,255,255,0.6)"/>
+          <circle cx="276" cy="308" r="9.5" fill="#fff"/>
+          <circle id="black-pupil-r" cx="276" cy="309" r="5" fill="#111"/>
+          <circle cx="273" cy="305" r="1.8" fill="rgba(255,255,255,0.6)"/>
+          <path id="black-mouth" d="M250,328 Q262,336 274,328"
+                stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </g>
+      </g>
+
+      <!-- 3. ORANGE — cx=135 (+30), cy=440, r=125 -->
+      <g id="orange-char" style="transform-origin: 135px 440px">
+        <ellipse cx="135" cy="444" rx="108" ry="10" fill="rgba(0,0,0,0.07)"/>
+        <circle cx="135" cy="440" r="125" fill="#F07D2A"/>
+        <g clip-path="url(#orange-clip)">
+          <ellipse cx="110" cy="372" rx="22" ry="15" fill="rgba(255,255,255,0.1)" transform="rotate(-15,110,372)"/>
+          <g id="orange-face" style="transform-origin: 135px 398px">
+            <circle cx="108" cy="394" r="10" fill="#fff"/>
+            <circle id="orange-pupil-l" cx="108" cy="396" r="5.5" fill="#1a1a1a"/>
+            <circle cx="105" cy="391" r="1.8" fill="rgba(255,255,255,0.65)"/>
+            <circle cx="160" cy="394" r="10" fill="#fff"/>
+            <circle id="orange-pupil-r" cx="160" cy="396" r="5.5" fill="#1a1a1a"/>
+            <circle cx="157" cy="391" r="1.8" fill="rgba(255,255,255,0.65)"/>
+            <path id="orange-mouth" d="M121,412 Q135,421 149,412"
+                  stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- 4. YELLOW — cx=313 (-35), top layer -->
+      <!-- body: x=287, w=52 → left=287, right=339, cx=313 -->
+      <g id="yellow-char" style="transform-origin: 313px 440px">
+        <ellipse cx="313" cy="444" rx="26" ry="4" fill="rgba(0,0,0,0.08)"/>
+        <rect x="287" y="316" width="52" height="124" fill="#F0C132" rx="26"/>
+        <ellipse cx="298" cy="330" rx="6" ry="9" fill="rgba(255,255,255,0.18)" transform="rotate(-8,298,330)"/>
+
+        <!-- SIDE FACE (idle, looking) -->
+        <g id="yellow-face-side">
+          <circle cx="319" cy="348" r="5" fill="#1a1a1a"/>
+          <circle cx="316" cy="345" r="1.8" fill="rgba(255,255,255,0.55)"/>
+          <line x1="312" y1="368" x2="322" y2="368"
+                stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+
+        <!-- COVERING FACE (unhappy) -->
+        <g id="yellow-face-covering" opacity="0">
+          <line x1="314" y1="348" x2="324" y2="348"
+                stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+          <path d="M311,370 Q317,366 323,370"
+                stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </g>
+
+        <!-- PEEKING FACE (curious wide eye) -->
+        <g id="yellow-face-peeking" opacity="0">
+          <circle cx="319" cy="348" r="6.5" fill="#1a1a1a"/>
+          <circle cx="315" cy="344" r="2.2" fill="rgba(255,255,255,0.6)"/>
+          <path d="M312,368 Q317,373 322,368"
+                stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </g>
+      </g>
+
+      <!-- Re-draw floor over characters (clip legs) -->
+      <rect x="0" y="440" width="420" height="120" fill="#d4cfc8"/>
+      <line x1="0" y1="440" x2="420" y2="440" stroke="rgba(0,0,0,0.05)" stroke-width="2"/>
+
+    </svg>
+  </div>
+
+  <!-- RIGHT: Login Form -->
+  <div class="right-panel">
+    <span class="logo">✦</span>
+    <h1>Welcome back!</h1>
+    <p class="subtitle">Please enter your details</p>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <div class="input-wrap">
+        <input type="email" id="email" placeholder="" autocomplete="email" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <div class="input-wrap">
+        <input type="password" id="password" placeholder="" autocomplete="current-password" />
+        <button class="eye-btn" id="toggle-pw" type="button" aria-label="Toggle password visibility">
+          <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="options-row">
+      <label class="remember-label">
+        <input type="checkbox" id="remember" />
+        Remember for 30 days
+      </label>
+      <a href="#" class="forgot-link">Forgot password?</a>
+    </div>
+
+    <button class="btn-login" type="button">Log In</button>
+
+    <button class="btn-google" type="button">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Log In with Google
+    </button>
+
+    <div class="signup-row">
+      Don't have an account? <a href="#">Sign Up</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+//  ANIMATION ENGINE — Web Animations API
+// ================================================================
+
+const emailInput    = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const togglePwBtn   = document.getElementById('toggle-pw');
+const eyeIcon       = document.getElementById('eye-icon');
+
+// Purple
+const purpleChar      = document.getElementById('purple-char');
+const purpleFace      = document.getElementById('purple-face');
+const purpleBodyGroup = document.getElementById('purple-body-group');
+const purplePupilL    = document.getElementById('purple-pupil-l');
+const purplePupilR    = document.getElementById('purple-pupil-r');
+const purpleMouth     = document.getElementById('purple-mouth');
+const purpleLidTL     = document.getElementById('purple-lid-top-l');
+const purpleLidBL     = document.getElementById('purple-lid-bot-l');
+const purpleLidTR     = document.getElementById('purple-lid-top-r');
+const purpleLidBR     = document.getElementById('purple-lid-bot-r');
+const purpleArmL      = document.getElementById('purple-arm-l');
+const purpleArmR      = document.getElementById('purple-arm-r');
+
+// Orange
+const orangeChar   = document.getElementById('orange-char');
+const orangeFace   = document.getElementById('orange-face');
+const orangePupilL = document.getElementById('orange-pupil-l');
+const orangePupilR = document.getElementById('orange-pupil-r');
+const orangeMouth  = document.getElementById('orange-mouth');
+
+// Black
+const blackChar    = document.getElementById('black-char');
+const blackFace    = document.getElementById('black-face');
+const blackPupilL  = document.getElementById('black-pupil-l');
+const blackPupilR  = document.getElementById('black-pupil-r');
+const blackMouth   = document.getElementById('black-mouth');
+
+// Yellow
+const yellowChar         = document.getElementById('yellow-char');
+const yellowFaceSide     = document.getElementById('yellow-face-side');
+const yellowFaceCovering = document.getElementById('yellow-face-covering');
+const yellowFacePeeking  = document.getElementById('yellow-face-peeking');
+
+// ---- State ----
+let currentState = 'idle';
+let pwVisible    = false;
+
+// ---- Running animations map ----
+const anims = new Map();
+
+function playAnim(key, el, keyframes, opts) {
+  if (anims.has(key)) { try { anims.get(key).cancel(); } catch(e){} }
+  const a = el.animate(keyframes, { fill: 'forwards', ...opts });
+  anims.set(key, a);
+  return a;
+}
+
+const EASE_OUT   = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+const EASE_INOUT = 'cubic-bezier(0.4, 0, 0.2, 1)';
+const EASE_SMOOTH = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+// ================================================================
+//  PURPLE EYELIDS
+//  Eye socket: cx=158/198, cy=258, r=12 → eye spans y=246..270
+//  Lid rects placed at: top y=233 h=25 (233..258), bot y=258 h=25 (258..283)
+//  OPEN: top translateY(-25px)→208..233 (above eye), bot translateY(+25px)→283..308 (below eye)
+//  CLOSED: translateY(0) → together cover 233..283, eye is 246..270 → fully covered ✓
+// ================================================================
+
+function purpleCloseEyes(duration = 280) {
+  ['plTL','plTR'].forEach((k,i) => {
+    const el = i===0 ? purpleLidTL : purpleLidTR;
+    playAnim(k, el,
+      [{ transform: 'translateY(-25px)' }, { transform: 'translateY(0px)' }],
+      { duration, easing: EASE_INOUT });
+  });
+  ['plBL','plBR'].forEach((k,i) => {
+    const el = i===0 ? purpleLidBL : purpleLidBR;
+    playAnim(k, el,
+      [{ transform: 'translateY(25px)' }, { transform: 'translateY(0px)' }],
+      { duration, easing: EASE_INOUT });
+  });
+}
+
+function purpleOpenEyes(duration = 220) {
+  ['plTL','plTR'].forEach((k,i) => {
+    const el = i===0 ? purpleLidTL : purpleLidTR;
+    playAnim(k, el,
+      [{ transform: 'translateY(0px)' }, { transform: 'translateY(-25px)' }],
+      { duration, easing: EASE_OUT });
+  });
+  ['plBL','plBR'].forEach((k,i) => {
+    const el = i===0 ? purpleLidBL : purpleLidBR;
+    playAnim(k, el,
+      [{ transform: 'translateY(0px)' }, { transform: 'translateY(25px)' }],
+      { duration, easing: EASE_OUT });
+  });
+}
+
+function purplePeekEyes() {
+  // Partial open — lids pulled back halfway
+  ['plTL','plTR'].forEach((k,i) => {
+    const el = i===0 ? purpleLidTL : purpleLidTR;
+    playAnim(k, el,
+      [{ transform: 'translateY(0px)' }, { transform: 'translateY(-11px)' }],
+      { duration: 320, easing: EASE_OUT });
+  });
+  ['plBL','plBR'].forEach((k,i) => {
+    const el = i===0 ? purpleLidBL : purpleLidBR;
+    playAnim(k, el,
+      [{ transform: 'translateY(0px)' }, { transform: 'translateY(11px)' }],
+      { duration: 320, easing: EASE_OUT });
+  });
+}
+
+function initEyelids() {
+  purpleLidTL.style.transform = 'translateY(-25px)';
+  purpleLidTR.style.transform = 'translateY(-25px)';
+  purpleLidBL.style.transform = 'translateY(25px)';
+  purpleLidBR.style.transform = 'translateY(25px)';
+}
+
+// ================================================================
+//  PURPLE NECK STRETCH / SHRINK
+//  Base body: y=175, h=265
+//  looking: stretch up by ~20px (curious lean-in)
+//  peeking: stretch up by ~32px (peek over arms)
+//  covering: shrink down by ~10px (cower/hide)
+//  idle: return to base
+// ================================================================
+
+let purpleNeckOffset = 0; // positive = stretched up, negative = shrunk
+
+function purpleSetNeck(amount, dur = 380) {
+  // amount > 0: face moves up, body extends up (neck stretch)
+  // amount < 0: face moves down slightly, body shrinks up (cower)
+  // amount = 0: return to base
+  const prevAmount = purpleNeckOffset;
+  purpleNeckOffset = amount;
+
+  playAnim('purpleFaceY', purpleFace,
+    [{ transform: `translateY(${-prevAmount}px)` }, { transform: `translateY(${-amount}px)` }],
+    { duration: dur, easing: EASE_OUT });
+
+  const bodyRect = document.getElementById('purple-body-rect');
+  const baseY = 175, baseH = 265;
+  const fromY = baseY - prevAmount;
+  const fromH = baseH + prevAmount;
+  const toY   = baseY - amount;
+  const toH   = baseH + amount;
+
+  playAnim('purpleBodyY', bodyRect,
+    [{ y: String(fromY) }, { y: String(toY) }],
+    { duration: dur, easing: EASE_OUT });
+  playAnim('purpleBodyH', bodyRect,
+    [{ height: String(fromH) }, { height: String(toH) }],
+    { duration: dur, easing: EASE_OUT });
+  bodyRect.setAttribute('y', toY);
+  bodyRect.setAttribute('height', toH);
+}
+
+// Legacy wrappers used by state machine
+function purpleStretchNeck(amount = 32) { purpleSetNeck(amount, 400); }
+function purpleRetractNeck()             { purpleSetNeck(0, 340); }
+
+// ================================================================
+//  PURPLE ARMS
+// ================================================================
+function purpleRaiseArms() {
+  playAnim('paL', purpleArmL,
+    [{ transform: 'rotate(0deg)' }, { transform: 'rotate(100deg)' }],
+    { duration: 380, easing: EASE_OUT });
+  playAnim('paR', purpleArmR,
+    [{ transform: 'rotate(0deg)' }, { transform: 'rotate(-100deg)' }],
+    { duration: 380, easing: EASE_OUT });
+}
+
+function purpleLowerArms() {
+  playAnim('paL', purpleArmL,
+    [{ transform: 'rotate(100deg)' }, { transform: 'rotate(0deg)' }],
+    { duration: 300, easing: EASE_INOUT });
+  playAnim('paR', purpleArmR,
+    [{ transform: 'rotate(-100deg)' }, { transform: 'rotate(0deg)' }],
+    { duration: 300, easing: EASE_INOUT });
+}
+
+function purpleArmsPeek() {
+  playAnim('paL', purpleArmL,
+    [{ transform: 'rotate(100deg)' }, { transform: 'rotate(70deg)' }],
+    { duration: 300, easing: EASE_OUT });
+  playAnim('paR', purpleArmR,
+    [{ transform: 'rotate(-100deg)' }, { transform: 'rotate(-70deg)' }],
+    { duration: 300, easing: EASE_OUT });
+}
+
+// ================================================================
+//  YELLOW FACE SWITCH — 3 states: side (idle/looking), covering, peeking
+// ================================================================
+function yellowSetFace(which, instant = false) {
+  const dur = instant ? 0 : 200;
+  const faces = {
+    side:     yellowFaceSide,
+    covering: yellowFaceCovering,
+    peeking:  yellowFacePeeking,
+  };
+  Object.entries(faces).forEach(([name, el]) => {
+    const targetOpacity = name === which ? '1' : '0';
+    const fromOpacity = el.getAttribute('opacity') || (name === 'side' ? '1' : '0');
+    playAnim('yf-' + name, el,
+      [{ opacity: fromOpacity }, { opacity: targetOpacity }],
+      { duration: dur, easing: EASE_SMOOTH });
+    el.setAttribute('opacity', targetOpacity);
+  });
+}
+
+// ================================================================
+//  PUPILS
+// ================================================================
+function movePurplePupils(lx, ly, rx, ry, dur = 250) {
+  playAnim('ppL', purplePupilL,
+    [{ cx: purplePupilL.getAttribute('cx'), cy: purplePupilL.getAttribute('cy') },
+     { cx: String(158 + lx), cy: String(258 + ly) }],
+    { duration: dur, easing: EASE_OUT });
+  purplePupilL.setAttribute('cx', 158 + lx);
+  purplePupilL.setAttribute('cy', 258 + ly);
+
+  playAnim('ppR', purplePupilR,
+    [{ cx: purplePupilR.getAttribute('cx'), cy: purplePupilR.getAttribute('cy') },
+     { cx: String(198 + rx), cy: String(258 + ry) }],
+    { duration: dur, easing: EASE_OUT });
+  purplePupilR.setAttribute('cx', 198 + rx);
+  purplePupilR.setAttribute('cy', 258 + ry);
+}
+
+function moveBlackPupils(lx, ly, rx, ry) {
+  blackPupilL.setAttribute('cx', 248 + lx);
+  blackPupilL.setAttribute('cy', 309 + ly);
+  blackPupilR.setAttribute('cx', 276 + rx);
+  blackPupilR.setAttribute('cy', 309 + ry);
+}
+
+function moveOrangePupils(lx, ly, rx, ry) {
+  orangePupilL.setAttribute('cx', 108 + lx);
+  orangePupilL.setAttribute('cy', 396 + ly);
+  orangePupilR.setAttribute('cx', 160 + rx);
+  orangePupilR.setAttribute('cy', 396 + ry);
+}
+
+// ================================================================
+//  BODY LEAN
+// ================================================================
+function leanChar(el, key, transform, dur = 360) {
+  const from = el.dataset.transform || 'rotate(0deg) translate(0px,0px)';
+  playAnim(key, el,
+    [{ transform: from }, { transform }],
+    { duration: dur, easing: EASE_OUT });
+  el.dataset.transform = transform;
+}
+
+// ================================================================
+//  STATE MACHINE
+// ================================================================
+function setState(newState) {
+  if (currentState === newState) return;
+  currentState = newState;
+
+  if (newState === 'idle') {
+    purpleOpenEyes();
+    purpleLowerArms();
+    purpleSetNeck(0);
+    yellowSetFace('side');
+    movePurplePupils(0, 0, 0, 0);
+    setMouth(orangeMouth, 'M121,412 Q135,421 149,412');
+    setMouth(blackMouth,  'M250,328 Q262,336 274,328');
+    leanChar(purpleChar, 'purpleBody', 'rotate(0deg) translate(0px,0px)');
+    leanChar(blackChar,  'blackBody',  'rotate(0deg) translate(0px,0px)');
+    leanChar(orangeChar, 'orangeBody', 'rotate(0deg) translate(0px,0px)');
+    leanChar(yellowChar, 'yellowBody', 'rotate(0deg) translate(0px,0px)');
+    moveBlackPupils(0, 0, 0, 0);
+    moveOrangePupils(0, 0, 0, 0);
+  }
+
+  else if (newState === 'looking') {
+    purpleOpenEyes(200);
+    purpleLowerArms();
+    purpleSetNeck(18);  // curious lean: stretch neck slightly
+    yellowSetFace('side');
+    movePurplePupils(5, -1, 5, -1);
+    leanChar(purpleChar, 'purpleBody', 'rotate(4deg) translate(4px,-5px)');
+    leanChar(blackChar,  'blackBody',  'rotate(5deg) translate(5px,-3px)');
+    leanChar(orangeChar, 'orangeBody', 'rotate(5deg) translate(4px,0px)');
+    leanChar(yellowChar, 'yellowBody', 'rotate(7deg) translate(3px,-5px)');
+    moveBlackPupils(4, -1, 4, -1);
+    moveOrangePupils(5, -1, 5, -1);
+    setMouth(orangeMouth, 'M121,410 Q135,419 149,410');
+    setMouth(blackMouth,  'M250,326 Q262,333 274,326');
+  }
+
+  else if (newState === 'covering') {
+    purpleCloseEyes();
+    purpleRaiseArms();
+    purpleSetNeck(-8);  // cower: shrink neck slightly
+    yellowSetFace('covering');
+    movePurplePupils(0, 0, 0, 0);
+    leanChar(purpleChar, 'purpleBody', 'rotate(-1deg) translate(-1px,0px)');
+    leanChar(blackChar,  'blackBody',  'rotate(-6deg) translate(-5px,-2px)');
+    leanChar(orangeChar, 'orangeBody', 'rotate(-4deg) translate(-3px,4px)');
+    leanChar(yellowChar, 'yellowBody', 'rotate(-8deg) translate(-4px,6px)');
+    moveBlackPupils(-3, 1, -3, 1);
+    moveOrangePupils(-3, 2, -3, 2);
+    setMouth(orangeMouth, 'M124,416 Q135,411 146,416');
+    setMouth(blackMouth,  'M250,331 Q262,327 274,331');
+  }
+
+  else if (newState === 'peeking') {
+    purplePeekEyes();
+    purpleArmsPeek();
+    purpleSetNeck(32);  // peek: full neck stretch like 胆小菇
+    yellowSetFace('peeking');
+    movePurplePupils(3, 5, 3, 5);
+    leanChar(purpleChar, 'purpleBody', 'rotate(2deg) translate(3px,-2px)');
+    leanChar(blackChar,  'blackBody',  'rotate(4deg) translate(4px,-2px)');
+    leanChar(orangeChar, 'orangeBody', 'rotate(4deg) translate(3px,-3px)');
+    leanChar(yellowChar, 'yellowBody', 'rotate(5deg) translate(3px,-4px)');
+    moveBlackPupils(3, 2, 3, 2);
+    moveOrangePupils(3, 1, 3, 1);
+    setMouth(orangeMouth, 'M121,410 Q135,419 149,410');
+    setMouth(blackMouth,  'M250,326 Q262,333 274,326');
+  }
+}
+
+// ================================================================
+//  MOUTH MORPHING
+// ================================================================
+function setMouth(el, d, dur = 260) {
+  try {
+    playAnim('mouth-' + el.id, el,
+      [{ d: 'path("' + el.getAttribute('d') + '")' },
+       { d: 'path("' + d + '")' }],
+      { duration: dur, easing: EASE_INOUT });
+  } catch(e) { /* d attribute animation not supported in this browser */ }
+  el.setAttribute('d', d);
+}
+
+// ================================================================
+//  IDLE BREATHING
+// ================================================================
+function startIdleAnimations() {
+  const chars = [
+    { el: orangeChar, delay: 0,   period: 2600, amp: 5 },
+    { el: purpleChar, delay: 400, period: 3000, amp: 6 },
+    { el: blackChar,  delay: 800, period: 2800, amp: 4 },
+    { el: yellowChar, delay: 200, period: 2400, amp: 5 },
+  ];
+  chars.forEach(({ el, delay, period, amp }) => {
+    function breathe() {
+      if (currentState !== 'idle') { setTimeout(breathe, 500); return; }
+      el.animate([
+        { transform: 'translate(0px,0px)' },
+        { transform: `translate(0px,-${amp}px)` },
+        { transform: 'translate(0px,0px)' }
+      ], { duration: period, easing: 'ease-in-out' }).finished.then(breathe);
+    }
+    setTimeout(breathe, delay);
+  });
+}
+
+// ================================================================
+//  BLINK
+// ================================================================
+function doBlink() {
+  if (currentState !== 'idle' && currentState !== 'looking') return;
+  purpleCloseEyes(80);
+  setTimeout(() => purpleOpenEyes(100), 130);
+}
+setInterval(doBlink, 3000 + Math.random() * 2000);
+
+// ================================================================
+//  EVENT LISTENERS
+// ================================================================
+emailInput.addEventListener('focus', () => setState('looking'));
+emailInput.addEventListener('input', () => { if (currentState !== 'looking') setState('looking'); });
+emailInput.addEventListener('blur', () => {
+  setTimeout(() => {
+    if (document.activeElement !== passwordInput && document.activeElement !== togglePwBtn)
+      setState('idle');
+  }, 80);
+});
+
+passwordInput.addEventListener('focus', () => setState(pwVisible ? 'peeking' : 'covering'));
+passwordInput.addEventListener('input', () => {
+  if (currentState !== 'covering' && currentState !== 'peeking')
+    setState(pwVisible ? 'peeking' : 'covering');
+});
+passwordInput.addEventListener('blur', () => {
+  setTimeout(() => {
+    if (document.activeElement !== emailInput && document.activeElement !== togglePwBtn)
+      setState('idle');
+  }, 80);
+});
+
+togglePwBtn.addEventListener('click', () => {
+  pwVisible = !pwVisible;
+  passwordInput.type = pwVisible ? 'text' : 'password';
+  eyeIcon.innerHTML = pwVisible
+    ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+       <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+       <line x1="1" y1="1" x2="23" y2="23"/>`
+    : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+       <circle cx="12" cy="12" r="3"/>`;
+  if (document.activeElement === passwordInput || document.activeElement === togglePwBtn) {
+    currentState = '__force__';
+    setState(pwVisible ? 'peeking' : 'covering');
+  }
+});
+
+// ================================================================
+//  INIT
+// ================================================================
+initEyelids();
+yellowSetFace('side', true);
+startIdleAnimations();
+
+// Entrance stagger
+[orangeChar, purpleChar, blackChar, yellowChar].forEach((el, i) => {
+  el.animate([
+    { opacity: 0, transform: 'translateY(30px)' },
+    { opacity: 1, transform: 'translateY(0px)' }
+  ], { duration: 600, delay: 80 + i * 90, easing: EASE_OUT, fill: 'forwards' });
+});
+</script>
+
+</body>
+</html>
